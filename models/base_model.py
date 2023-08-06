@@ -2,7 +2,7 @@
 """ base model super class """
 from uuid import uuid4
 from datetime import datetime
-from models.__init__ import storage
+import models
 
 
 class BaseModel:
@@ -23,7 +23,7 @@ class BaseModel:
             self.id = str(uuid4())
             self.created_at = datetime.today()
             self.updated_at = datetime.today()
-            storage.new(self)
+            models.storage.new(self)
 
     def __str__(self):
         """ string representation of the BaseModel intance """
@@ -33,8 +33,8 @@ class BaseModel:
 
     def save(self):
         """ updates the instance attribute update_at """
-        self.updated_at = datetime.today()
-        storage.save()
+        self.updated_at = datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         """return all keys and values of the objectinstance from __dict__"""

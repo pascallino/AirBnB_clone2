@@ -3,6 +3,7 @@
 import sys
 import os
 import json
+from models.base_model import BaseModel
 
 
 class FileStorage:
@@ -36,5 +37,8 @@ class FileStorage:
             return
         with open(FileStorage.__file_path, "r", encoding="utf-8") as file:
             pyobj = json.load(file)
-            self.__objects = pyobj
+            for cl in pyobj.values():
+                clName = cl["__class__"]
+                del cl["__class__"]
+                self.new(eval(clName)(**cl))
 
