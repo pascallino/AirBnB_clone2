@@ -38,6 +38,7 @@ class HBNBCommand(cmd.Cmd):
     def do_create(self, arg):
         """ create an object class with an id """
         args = tokenize(arg)
+        print(args)
         if len(args) == 0:
             print("** class name missing **")
         else:
@@ -46,26 +47,6 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print(eval(args[0])().id)
                 storage.save()
-
-    def do_show(self, arg):
-        """ Prints the string representation of an
-        instance based on the class name and id
-        """
-        args = tokenize(arg)
-        loadallobj = storage.all()
-        if len(args) > 1:
-            clName_id = f"{args[0]}.{args[1]}"
-        if len(args) == 0:
-            print("** class name missing **")
-        else:
-            if not args[0] in self.__classes:
-                print("** class doesn't exist **")
-            elif len(args) == 1:
-                print("** instance id missing **")
-            elif clName_id not in loadallobj:
-                print("** no instance found **")
-            else:
-                print(loadallobj[clName_id])
 
 
 if __name__ == '__main__':
