@@ -67,6 +67,26 @@ class HBNBCommand(cmd.Cmd):
             else:
                 print(loadallobj[clName_id])
 
+    def do_destroy(self, arg):
+        """ Prints the string representation of an
+        instance based on the class name and id
+        """
+        args = tokenize(arg)
+        loadallobj = storage.all()
+        if len(args) > 1:
+            clName_id = f"{args[0]}.{args[1]}"
+        if len(args) == 0:
+            print("** class name missing **")
+        else:
+            if not args[0] in self.__classes:
+                print("** class doesn't exist **")
+            elif len(args) == 1:
+                print("** instance id missing **")
+            elif clName_id not in loadallobj:
+                print("** no instance found **")
+            else:
+                del loadallobj[clName_id]
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
