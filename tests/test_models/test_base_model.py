@@ -11,6 +11,7 @@ import os
 import unittest
 from models.base_model import BaseModel
 from datetime import datetime
+import models
 
 
 class TestBaseModel_Init(unittest.TestCase):
@@ -67,7 +68,6 @@ class TestBaseModel_Init(unittest.TestCase):
 
     def test_dict_keys_values(self):
         """Tests for the to_dict(). """
-
         base1 = BaseModel()
         base1.name = "Pascal"
         base1.age = 28
@@ -78,6 +78,28 @@ class TestBaseModel_Init(unittest.TestCase):
         self.assertEqual(bcopy["updated_at"], base1.updated_at.isoformat())
         self.assertEqual(bcopy["name"], base1.name)
         self.assertEqual(bcopy["age"], base1.age)
+
+    def test_kwargs(self):
+        """ test kwargs argument to_dict() args """
+        dtnow = datetime.today()
+        dt_str = dtnow.isoformat()
+        bmodel1 = BaseModel(id="123", created_at=dt_str, updated_at=dt_str)
+        self.assertEqual(bmodel1.id, "123")
+        self.assertEqual(bmodel1.created_at, dtnow)
+        self.assertEqual(bmodel1.updated_at, dtnow)
+
+    def test_str_(self):
+        """ str representation test """
+        dtnow = datetime.today()
+        dt_repr = repr(dtnow)
+        bmodel1 = BaseModel()
+        bmodel1.id = "888888"
+        bmodel1.created_at = bmodel1.updated_at = dtnow
+        bmodel1str = bmodel1.__str__()
+        self.assertIn("[BaseModel] (888888)", bmodel1str)
+        self.assertIn("'id': '888888'", bmodel1str)
+        self.assertIn("'created_at': " + dt_repr, bmodel1str)
+        self.assertIn("'updated_at': " + dt_repr, bmodel1str)
 
 
 if __name__ == '__main__':
