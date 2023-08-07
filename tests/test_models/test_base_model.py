@@ -11,6 +11,8 @@ import os
 import unittest
 from models.base_model import BaseModel
 from datetime import datetime
+import time
+import uuid
 import models
 
 
@@ -100,6 +102,70 @@ class TestBaseModel_Init(unittest.TestCase):
         self.assertIn("'id': '888888'", bmodel1str)
         self.assertIn("'created_at': " + dt_repr, bmodel1str)
         self.assertIn("'updated_at': " + dt_repr, bmodel1str)
+
+    def test_save_time_diff(self):
+        """Test save() method time interval"""
+        bmodel1 = BaseModel()
+        time.sleep(0.5)
+        dtnow = datetime.now()
+        bmodel1.save()
+        dtdiff = bmodel1.updated_at - dtnow
+        self.assertTrue(abs(dtdiff.total_seconds()) < 0.01)
+
+    def test_for_None_kwargs_params(self):
+        """ test for none for all key value parameters"""
+        with self.assertRaises(TypeError):
+            BaseModel(id=None, created_at=None, updated_at=None)
+
+class TestBaseModel_to_dict(unittest.TestCase):
+    """Unittests for to_dict method from BaseModel class."""
+
+    def test_overidedict_with_inbuiltdict(self):
+        """ test bm to_dict() method with_inbuilt __dict__"""
+        bmodel = BaseModel()
+        self.assertNotEqual(bmodel.to_dict(), bmodel.__dict__)
+
+    def test_two_object_dict(self):
+        """test with instantiated **kwargs from custom dictionary."""
+        d = {"__class__": "BaseModel",
+             "updated_at":
+             datetime(2024, 12, 30, 23, 59, 59, 123456).isoformat(),
+             "created_at": datetime.now().isoformat(),
+             "id": uuid.uuid4(),
+             "name": "Pascal",
+             "age": 18,
+             "CGPA": 3.34}
+        o = BaseModel(**d)
+        self.assertEqual(o.to_dict(), d)
+
+    def test__int__with_to_dict(self):
+        """test to_dict() with **kwargs."""
+        model = BaseModel()
+        model.name = "julien"
+        model.my_number = 30
+        my_new_model_json = model.to_dict()
+        my_new_model = BaseModel(**my_new_model_json)
+        self.assertEqual(my_new_model.to_dict(), model.to_dict())
+
+    def test_to_dict_object_type(self):
+        """ test type for two dict objects """
+        bmodel = BaseModel()
+        self.assertTrue(dict, type(bmodel.to_dict()))
+
+    def test_to_dict_attributes(self):
+        """ test to_dict attr are same """
+        bmodel = BaseModel()
+        bmodel.my_name = "Mr pascal"
+        bmodel.my_age = 28
+        self.assertIn("my_name", bmodel.to_dict())
+        self.assertIn("my_age", bmodel.to_dict())
+
+    def test_to_dict_datetime_params_are_type_str(self):
+        """ test date type for created_at & updated_at"""
+        bmodel = BaseModel()
+        bmodel_dict = bmodel.to_dict()
+        self.assertEqual(str, type(bmodel_dict["created_at"]))
+        self.assertEqual(str, type(bmodel_dict["updated_at"]))
 
 
 if __name__ == '__main__':
