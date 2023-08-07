@@ -8,7 +8,7 @@ import sys
 class HBNBCommand(cmd.Cmd):
     """ Configures the command Interpreter for Holberton app """
     prompt = "(hbnb) "
-    intro = 'Simple Command Interpreter for the holberton Web app'
+    # intro = 'Simple Command Interpreter for the holberton Web app'
 
     def do_EOF(self, arg):
         """ End of File """
@@ -16,7 +16,7 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def do_quit(self, arg):
-        """ Quit the command Interpreter """
+        """Quit command to exit the program.\n"""
         return True
 
     def emptyline(self):
