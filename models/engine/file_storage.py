@@ -13,7 +13,7 @@ from models.state import State
 
 
 class FileStorage:
-    """ File Storage class to store the 
+    """ File Storage class to store the
     to save the obj dict to json string and retrieve
     as Object"""
     __file_path = "file.json"
@@ -37,7 +37,7 @@ class FileStorage:
             json.dump(dict, file)
 
     def reload(self):
-        """ deserializes back to python object 
+        """ deserializes back to python object
         do nothing if the file doesnt exist"""
         if not os.path.isfile(FileStorage.__file_path):
             return
@@ -47,4 +47,3 @@ class FileStorage:
                 clName = cl["__class__"]
                 del cl["__class__"]
                 self.new(eval(clName)(**cl))
-

@@ -13,10 +13,28 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 
+
 def tokenize(line):
     """ tokenize : converts the line into tuples and last
     element is always the full line"""
-    return [i.strip(",") for i in split(line)]
+    aud = {}
+    dictbraces = re.search(r"\{(.*?)\}", line)
+    if dictbraces is None:
+        aud = []
+        dictbraces = re.search(r"\[(.*?)\]", line)
+    if dictbraces is None:
+        return [i.strip(",") for i in split(line)]
+    else:
+        aud = dictbraces.group()
+        aul = []
+        k = 0
+        for i in split(line):
+            aul.append(i.strip(" "))
+            k = k + 1
+            if k == 2:
+                break
+        aul.append(eval(aud))
+        return aul
 
 
 class HBNBCommand(cmd.Cmd):
@@ -24,7 +42,12 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
     __classes = [
             "BaseModel",
-            "User"]
+            "User",
+            "State",
+            "City",
+            "Place",
+            "Amenity",
+            "Review"]
     # intro = 'Simple Command Interpreter for the holberton Web app'
 
     def do_EOF(self, arg):
@@ -92,20 +115,22 @@ class HBNBCommand(cmd.Cmd):
                 print("** no instance found **")
             else:
                 del loadallobj[clName_id]
+                storage.save()
 
     def do_all(self, arg):
-        """ Deletes an instance based on the
-        class name and id
+        """Prints all string representation of all
+        instances based or not on the class name.
+        <class name>.all(), all, all <class name>
         """
         objlist = []
         args = tokenize(arg)
         loadallobj = storage.all()
-        if len(args) > 1:
+        if len(args) >= 1:
             if not args[0] in self.__classes:
                 print("** class doesn't exist **")
             else:
                 for obj in loadallobj.values():
-                    if obj__class__.__name__ == args[0]:
+                    if obj.__class__.__name__ == args[0]:
                         objlist.append(obj.__str__())
                 print(objlist)
         else:
@@ -136,22 +161,20 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
             return False
         if len(args) == 3:
-            try:
-                type(eval(argl[2])) != dict
-            except NameError:
+            if not isinstance(args[2], dict):
                 print("** value missing **")
                 return False
-        if len(args) == 4:
+        if len(args) >= 4 and not isinstance(args[2], dict):
             upt = loadallobj[clName_id]
             if args[2] in upt.__class__.__dict__.keys():
                 valdatatype = type(upt.__class__.__dict__[args[2]])
                 upt.__dict__[args[2]] = valdatatype(args[3])
             else:
                 upt.__dict__[args[2]] = args[3]
-        elif len(args) == 3 and type(eval(argl[2])) == dict:
+        elif len(args) >= 3:
             upt = loadallobj[clName_id]
             keylist = upt.__class__.__dict__
-            for key, value in eval(argl[2]).items():
+            for key, value in args[2].items():
                 if (key in keylist.keys() and
                         type(keylist[key]) in [str, int, float]):
                     valdatatype = type(upt.__class__.__dict__[key])
@@ -159,6 +182,60 @@ class HBNBCommand(cmd.Cmd):
                 else:
                     upt.__dict__[key] = value
         storage.save()
+
+    def do_count(self, arg):
+        """Usage: count <class> or <class>.count()
+        Retrieve the number of instances of a given class."""
+        args = tokenize(arg)
+        count = 0
+        for Allobj in storage.all().values():
+            if args[0] == Allobj.__class__.__name__:
+                count += 1
+        print(count)
+
+    def default(self, arg):
+        """cmd default behavior for cmd module when input is invalid"""
+        func = {
+            "all": self.do_all,
+            "show": self.do_show,
+            "destroy": self.do_destroy,
+            "update": self.do_update,
+            "count": self.do_count
+        }
+        aul = []
+        aud = {}
+        match = re.search(r"\.", arg)
+        if match is not None:
+            argl = [arg[:match.span()[0]], arg[match.span()[1]:]]
+            match = re.search(r"\((.*?)\)", argl[1])
+            if match is not None:
+                cmd = [argl[1][:match.span()[0]], match.group()[1:-1]]
+                if cmd[0] != "update":
+                    match = re.search(r"\((.*?)\)", argl[1])
+                    argl[1] = match.group()[2:-2]
+                elif cmd[0] == "update":
+                    db = re.search(r"\{(.*?)\}", match.group()[1:-1])
+                    if db is None:
+                        db = re.search(r"\[(.*?)\]", match.group()[1:-1])
+                    if db is None:
+                        au = [i.strip(",") for i in split(match.group()[1:-1])]
+                    else:
+                        for i in split(match.group()[1:-1]):
+                            aul.append(i.strip(","))
+                            break
+                        aud = db.group()
+                if cmd[0] in func.keys():
+                    if len(argl[1]) > 20 and not cmd[0] == "update":
+                        call = f"{argl[0]} {argl[1]} {cmd[0]}"
+                    elif cmd[0] == "update" and len(aul) <= 0:
+                        call = f"{argl[0]} {au[0]} {au[1]} {au[2]}"
+                    elif cmd[0] == "update" and len(aul) > 0:
+                        call = f"{argl[0]} {aul[0]} {aud}"
+                    else:
+                        call = f"{argl[0]} {cmd[0]}"
+                    return func[cmd[0]](call)
+        print("*** Unknown syntax: {}".format(arg))
+        return False
 
 
 if __name__ == '__main__':
