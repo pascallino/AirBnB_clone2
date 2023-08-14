@@ -1,4 +1,4 @@
-#!/usr/env/python3
+#!/usr/bin/python3
 """ The file storage engine where the file will be stored """
 import sys
 import os
@@ -16,18 +16,19 @@ class FileStorage:
     """ File Storage class to store the
     to save the obj dict to json string and retrieve
     as Object"""
+
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
         """ returns the dictionary objects using json.load """
-        return self.__objects
+        return FileStorage.__objects
 
     def new(self, obj):
         """ sets in object with key classname.id """
         clName = obj.__class__.__name__
-        k = f"{clName}.{obj.id}"
-        self.__objects[k] = obj
+        key = f"{clName}.{obj.id}"
+        FileStorage.__objects[key] = obj
 
     def save(self):
         """ serializes the object into the json file """

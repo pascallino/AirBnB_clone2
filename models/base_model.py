@@ -1,12 +1,14 @@
 #!/usr/bin/python3
-""" base model super class """
+""" base model super class to be used
+by allsub classes """
+
 from uuid import uuid4
 from datetime import datetime
 import models
 
 
 class BaseModel:
-    """ Basmodel for other classes """
+    """ Basmodel for other classes save __str__ new """
 
     def __init__(self, *args, **kwargs):
         """ initializes the class attributes*arg is an unused variable"""
@@ -27,7 +29,8 @@ class BaseModel:
 
     def __str__(self):
         """ string representation of the BaseModel intance """
-        clName = self.__class__.__name__
+        # clName = self.__class__.__name__
+        clName = type(self).__name__
         str = f"[{clName}] ({self.id}) {self.__dict__}"
         return str
 

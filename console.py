@@ -60,12 +60,11 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def emptyline(self):
-        """ Empty line triggered """
+        """Empty line triggered"""
         pass
 
     def do_create(self, arg):
-        """Ex: $ create BaseModel
-        create an object class with an id """
+        """Ex: $ create User/State create an object class with an id"""
         args = tokenize(arg)
         if len(args) == 0:
             print("** class name missing **")
@@ -77,9 +76,8 @@ class HBNBCommand(cmd.Cmd):
                 storage.save()
 
     def do_show(self, arg):
-        """ Prints the string representation of an
-        instance based on the class name and id
-        """
+        """ Prints the string representation of an \
+                instance based on the class name and id"""
         args = tokenize(arg)
         loadallobj = storage.all()
         if len(args) > 1:
@@ -97,9 +95,7 @@ class HBNBCommand(cmd.Cmd):
                 print(loadallobj[clName_id])
 
     def do_destroy(self, arg):
-        """ Prints the string representation of an
-        instance based on the class name and id
-        """
+        """Deletes an object from file.json"""
         args = tokenize(arg)
         loadallobj = storage.all()
         if len(args) > 1:
@@ -118,10 +114,7 @@ class HBNBCommand(cmd.Cmd):
                 storage.save()
 
     def do_all(self, arg):
-        """Prints all string representation of all
-        instances based or not on the class name.
-        <class name>.all(), all, all <class name>
-        """
+        """<class name>.all(), all, all <class name>"""
         objlist = []
         args = tokenize(arg)
         loadallobj = storage.all()
@@ -204,6 +197,7 @@ class HBNBCommand(cmd.Cmd):
         }
         aul = []
         aud = {}
+        au = []
         match = re.search(r"\.", arg)
         if match is not None:
             argl = [arg[:match.span()[0]], arg[match.span()[1]:]]
@@ -212,7 +206,7 @@ class HBNBCommand(cmd.Cmd):
                 cmd = [argl[1][:match.span()[0]], match.group()[1:-1]]
                 if cmd[0] != "update":
                     match = re.search(r"\((.*?)\)", argl[1])
-                    argl[1] = match.group()[2:-2]
+                    argl[1] = match.group()[1:-1]
                 elif cmd[0] == "update":
                     db = re.search(r"\{(.*?)\}", match.group()[1:-1])
                     if db is None:
@@ -225,14 +219,26 @@ class HBNBCommand(cmd.Cmd):
                             break
                         aud = db.group()
                 if cmd[0] in func.keys():
-                    if len(argl[1]) > 20 and not cmd[0] == "update":
-                        call = f"{argl[0]} {argl[1]} {cmd[0]}"
-                    elif cmd[0] == "update" and len(aul) <= 0:
-                        call = f"{argl[0]} {au[0]} {au[1]} {au[2]}"
+                    au0 = ""
+                    au1 = ""
+                    au2 = ""
+                    if len(au) == 1:
+                        au0 = au[0]
+                    elif len(au) == 2:
+                        au0 = au[0]
+                        au1 = au[1]
+                    elif len(au) == 3:
+                        au0 = au[0]
+                        au1 = au[1]
+                        au2 = au[2]
+                    if len(argl[1]) > 0 and not cmd[0] == "update":
+                        call = f"{argl[0]} {argl[1]}"
+                    elif cmd[0] == "update" and len(aul) <= 0 and len(au) > 0:
+                        call = f"{argl[0]} {au0} {au1} {au2}"
                     elif cmd[0] == "update" and len(aul) > 0:
                         call = f"{argl[0]} {aul[0]} {aud}"
                     else:
-                        call = f"{argl[0]} {cmd[0]}"
+                        call = f"{argl[0]} {''}"
                     return func[cmd[0]](call)
         print("*** Unknown syntax: {}".format(arg))
         return False

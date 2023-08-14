@@ -613,10 +613,12 @@ class TestHBNBCommand_all(unittest.TestCase):
 
 
 class TestHBNBCommand_count(unittest.TestCase):
-    """Unittests for testing count method of HBNB comand interpreter."""
+    """Unittest to count if the objects saved are matching with
+    whats in the json file"""
 
     @classmethod
     def setUp(self):
+        """ set up the enviromants """
         try:
             os.rename("file.json", "tmp")
         except IOError:
@@ -625,6 +627,7 @@ class TestHBNBCommand_count(unittest.TestCase):
 
     @classmethod
     def tearDown(self):
+        """ teardown the enviroments """
         try:
             os.remove("file.json")
         except IOError:
@@ -634,12 +637,14 @@ class TestHBNBCommand_count(unittest.TestCase):
         except IOError:
             pass
 
-    def test_count_invalid_class(self):
+    def test_count_wrong_class(self):
+        """ count from an invaluid calss """
         with patch("sys.stdout", new=StringIO()) as output:
-            self.assertFalse(HBNBCommand().onecmd("MyModel.count()"))
+            self.assertFalse(HBNBCommand().onecmd("pascal.count()"))
             self.assertEqual("0", output.getvalue().strip())
 
-    def test_count_object(self):
+    def test_count_specific_object(self):
+        """ count specific objects if same"""
         with patch("sys.stdout", new=StringIO()) as output:
             self.assertFalse(HBNBCommand().onecmd("create BaseModel"))
         with patch("sys.stdout", new=StringIO()) as output:
@@ -862,6 +867,13 @@ class TestHBNBCommand_update(unittest.TestCase):
         with patch("sys.stdout", new=StringIO()) as output:
             self.assertFalse(HBNBCommand().onecmd(Cmd))
             self.assertEqual(errormsg, output.getvalue().strip())
+        with patch("sys.stdout", new=StringIO()) as output:
+            self.assertFalse(HBNBCommand().onecmd("create Review"))
+            placeId = output.getvalue().strip()
+            Cmd = "Review.update({})".format(placeId)
+        with patch("sys.stdout", new=StringIO()) as output:
+            self.assertFalse(HBNBCommand().onecmd(Cmd))
+            self.assertEqual(errormsg, output.getvalue().strip())
 
     def test_update_command_for_missing_attribute_name(self):
         """test_update_command_for_missing_attribute_name"""
@@ -1074,6 +1086,14 @@ class TestHBNBCommand_update(unittest.TestCase):
         test_dict = storage.all()["Amenity.{}".format(AmdId)]
         self.assertEqual("house", test_dict.__dict__["asset"])
 
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().onecmd("create Review")
+            AmdId = output.getvalue().strip()
+        Cmd = "update Review {} text house".format(AmdId)
+        self.assertFalse(HBNBCommand().onecmd(Cmd))
+        test_dict = storage.all()["Review.{}".format(AmdId)]
+        self.assertEqual("house", test_dict.__dict__["text"])
+
     def test_update_if_value_are_same_parenthesis(self):
         """ test_update_if_value_are_same_parenthesis """
         with patch("sys.stdout", new=StringIO()) as output:
@@ -1123,6 +1143,14 @@ class TestHBNBCommand_update(unittest.TestCase):
         self.assertFalse(HBNBCommand().onecmd(Cmd))
         test_dict = storage.all()["Amenity.{}".format(AmdId)]
         self.assertEqual("house", test_dict.__dict__["asset"])
+
+        with patch("sys.stdout", new=StringIO()) as output:
+            HBNBCommand().onecmd("create Review")
+            AmdId = output.getvalue().strip()
+        Cmd = "Review.update({}, text, house)".format(AmdId)
+        self.assertFalse(HBNBCommand().onecmd(Cmd))
+        test_dict = storage.all()["Review.{}".format(AmdId)]
+        self.assertEqual("house", test_dict.__dict__["text"])
 
     def test_update_dictionary_key_and_value_pair(self):
         """test_update_dictionary_key_and_value_pair"""
