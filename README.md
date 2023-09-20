@@ -11,3 +11,7 @@ This is the first step towards building your first full web application: the Air
 * create all classes used for AirBnB (`User`, `State`, `City`, `Place`…) that inherit from BaseModel
 * create the first abstracted storage engine of the project: File storage.
 * create all unittests to validate all our classes and storage engine
+
+# 0x02. AirBnB clone - MySQL
+## Background Context
+Environment variables will be your best friend for this project!
